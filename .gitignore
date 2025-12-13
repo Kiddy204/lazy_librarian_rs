@@ -1,1 +1,14 @@
 *.csv
+__pycache__/
+.env
+*.npy
+*.npz
+*.pkl
+*.json
+*.parquet
+*.csv
+*.txt
+*.log
+*.err
+*.out
+*.err
