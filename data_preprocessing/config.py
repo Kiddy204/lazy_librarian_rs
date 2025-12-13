@@ -30,4 +30,13 @@ OUTPUT_FILES = {
     "author_encoder": OUTPUT_DIR / "author_encoder.pkl",
     "publisher_encoder": OUTPUT_DIR / "publisher_encoder.pkl",
     "feature_matrix": OUTPUT_DIR / "item_features.npz",
+    # Train/val/test splits
+    "train": OUTPUT_DIR / "train.parquet",
+    "val": OUTPUT_DIR / "val.parquet",
+    "test": OUTPUT_DIR / "test.parquet",
 }
+
+# Split settings
+TRAIN_RATIO = 0.7
+VAL_RATIO = 0.1
+TEST_RATIO = 0.2
