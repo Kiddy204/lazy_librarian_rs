@@ -12,7 +12,7 @@ from data_preprocessing.clean_items import clean_items
 from stats import print_clean_data_stats, print_re_indexing_items_stats, print_user_item_matrix_stats
 from split import create_train_test_split
 from submit import generate_submission
-from eval import compute_map_at_k
+from eval import compute_map_at_k_cf
 
 # 1- Load clean data
 items_df = pd.read_csv("data/items.csv")
@@ -118,7 +118,7 @@ def user_user_cf(train_data_matrix, test_data_matrix, user_index=None, item_inde
         return masked
     if mask_seen_items_bool:
         user_based_prediction = mask_seen_items(user_based_prediction, train_data_matrix)
-    user_map_score =  compute_map_at_k(user_based_prediction, test_data_matrix, k=10)
+    user_map_score =  compute_map_at_k_cf(user_based_prediction, test_data_matrix, k=10)
     submission_path = 'data/submissions/submission_user_based.csv'
     if user_index is not None and item_index is not None:
         user_based_submission = generate_submission(user_based_prediction, user_index, item_index, k=10)

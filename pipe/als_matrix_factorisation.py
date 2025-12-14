@@ -12,6 +12,7 @@ Assumptions:
 import sys
 import os
 
+from eval import compute_map_at_k_als
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
@@ -22,7 +23,6 @@ from implicit.als import AlternatingLeastSquares
 from data_preprocessing.clean_interactions import clean_interactions
 from data_preprocessing.clean_items import clean_items
 from split import create_train_test_split
-from eval import compute_map_at_k
 
 
 # ============================================================
@@ -84,7 +84,7 @@ def train_and_evaluate_als(
     scores = user_factors @ item_factors.T
     scores = mask_train_items(scores, train_matrix)
 
-    return compute_map_at_k(scores, test_matrix, k=k)
+    return compute_map_at_k_als(scores, test_matrix, k=k)
 
 
 # ============================================================
@@ -93,8 +93,8 @@ def train_and_evaluate_als(
 
 def als_grid_search(train_matrix, test_matrix):
     param_grid = {
-        "factors": [ 192],
-        "regularization": [ 0.1],
+        "factors": [192],
+        "regularization": [0.1],
         "alpha": [80],
         "iterations": [30, 40]
     }
@@ -190,4 +190,3 @@ if __name__ == "__main__":
         f"alpha={best_params[2]}, "
         f"iterations={best_params[3]}"
     )
-s
