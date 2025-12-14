@@ -2,7 +2,14 @@
 import pandas as pd
 import numpy as np
 
-from load_data import load_interactions
+import sys
+import os
+import pandas as pd
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+from data_preprocessing.load_data import load_interactions
 
 def clean_interactions(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()

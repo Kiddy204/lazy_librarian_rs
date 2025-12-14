@@ -1,5 +1,11 @@
 import pandas as pd
-from config import INTERACTIONS_FILE, ITEMS_FILE
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+from data_preprocessing.config import INTERACTIONS_FILE, ITEMS_FILE
 
 def load_interactions() -> pd.DataFrame:
     """Load and validate interactions data."""

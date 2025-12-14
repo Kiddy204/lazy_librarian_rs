@@ -1,9 +1,17 @@
 """Clean and prepare item metadata."""
 import pandas as pd
+
+
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 import re
 from typing import List, Optional
-from config import UNKNOWN_AUTHOR, UNKNOWN_PUBLISHER
-from load_data import load_interactions, load_items
+from data_preprocessing.config import UNKNOWN_AUTHOR, UNKNOWN_PUBLISHER
+from data_preprocessing.load_data import load_interactions, load_items
 
 def normalize_text(text: Optional[str]) -> str:
     """Normalize text: strip, collapse whitespace."""
