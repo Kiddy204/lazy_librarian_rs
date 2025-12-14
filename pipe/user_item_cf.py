@@ -12,6 +12,7 @@ from data_preprocessing.clean_items import clean_items
 from stats import print_clean_data_stats, print_re_indexing_items_stats, print_user_item_matrix_stats
 from split import create_train_test_split
 from submit import generate_submission
+from eval import compute_map_at_k
 
 # 1- Load clean data
 items_df = pd.read_csv("data/items.csv")
@@ -90,7 +91,6 @@ print_user_item_matrix_stats(train_user_item_matrix, test_user_item_matrix, val_
 
 
 # 5- User-based Collaborative Filtering
-### a. User-based predict
 def user_based_predict(interactions, similarity, epsilon=1e-9):
     """
     Predicts user-item interactions based on user-user similarity.
@@ -104,52 +104,6 @@ def user_based_predict(interactions, similarity, epsilon=1e-9):
     # Calculate the weighted sum of interactions based on user similarity
     pred = similarity.dot(interactions) / (np.abs(similarity).sum(axis=1)[:, np.newaxis] + epsilon)
     return pred
-
-def compute_map_at_k(predictions, test_matrix, k=10):
-    """
-    Compute Mean Average Precision at K (MAP@K) for recommendation evaluation.
-    
-    Parameters:
-        predictions (numpy array): Predicted scores matrix (n_users x n_items).
-        test_matrix (numpy array): Ground truth binary matrix (n_users x n_items).
-        k (int): Number of top recommendations to consider.
-    
-    Returns:
-        float: The MAP@K score.
-    """
-    n_users = predictions.shape[0]
-    average_precisions = []
-    
-    for user_idx in range(n_users):
-        # Get the actual relevant items for this user (items in test set)
-        relevant_items = set(np.where(test_matrix[user_idx] == 1)[0])
-        
-        # Skip users with no relevant items in test set
-        if len(relevant_items) == 0:
-            continue
-        
-        # Get top-k predicted items (sorted by predicted score, descending)
-        top_k_items = np.argsort(predictions[user_idx])[::-1][:k]
-        
-        # Compute Average Precision at K
-        hits = 0
-        precision_sum = 0.0
-        
-        for rank, item_idx in enumerate(top_k_items, start=1):
-            if item_idx in relevant_items:
-                hits += 1
-                precision_at_rank = hits / rank
-                precision_sum += precision_at_rank
-        
-        # Average precision for this user
-        # Normalize by min(k, number of relevant items)
-        # ap = precision_sum / min(k, len(relevant_items))
-        ap = precision_sum / len(relevant_items)
-        average_precisions.append(ap)
-    
-    # Mean Average Precision across all users
-    map_score = np.mean(average_precisions) if average_precisions else 0.0
-    return map_score
 
 def user_user_cf(train_data_matrix, test_data_matrix, user_index=None, item_index=None, mask_seen_items_bool=False, set_diagonal_to_zero_bool=False):
     user_similarity = cosine_similarity(train_data_matrix)
@@ -176,7 +130,7 @@ def user_user_cf(train_data_matrix, test_data_matrix, user_index=None, item_inde
         'predictions': user_based_prediction
     }
 
-# Predict user item matrix
+# 6- Test User-Based Collaborative Filtering
 def test_user_item_matrix_prediction(train_user_item_matrix, test_user_item_matrix, mask_seen_items_bool=False, set_diagonal_to_zero_bool=False):
     results = {}
     user_predictions = user_user_cf(train_user_item_matrix, test_user_item_matrix, user_index, item_index, mask_seen_items_bool=mask_seen_items_bool, set_diagonal_to_zero_bool=set_diagonal_to_zero_bool)
@@ -196,9 +150,4 @@ test_counts  = test_data.groupby("user_idx").size()
 
 print("Users with no train data:", (train_counts == 0).sum())
 print("Users with no test data:", (test_counts == 0).sum())
-#
-# build user subject matrix
-# build user publisher matrix
-# build user author matrix
-# matrix factorisation
 
