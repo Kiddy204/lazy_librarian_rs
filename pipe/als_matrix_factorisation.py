@@ -93,10 +93,10 @@ def train_and_evaluate_als(
 
 def als_grid_search(train_matrix, test_matrix):
     param_grid = {
-        "factors": [64, 128, 192],
-        "regularization": [0.01, 0.05, 0.1],
-        "alpha": [20, 40, 80],
-        "iterations": [30, 40]
+        "factors": [512],
+        "regularization": [0.05],
+        "alpha": [320],
+        "iterations": [30]
     }
 
     best_score = 0.0
