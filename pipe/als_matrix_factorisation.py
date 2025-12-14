@@ -46,11 +46,11 @@ def build_interaction_matrix(df, n_users, n_items, weight_col=None):
 # Mask Seen Items
 # ============================================================
 
-def mask_train_items(scores, train_matrix):
-    scores = scores.copy()
-    users, items = train_matrix.nonzero()
-    scores[users, items] = -np.inf
-    return scores
+# def mask_train_items(scores, train_matrix):
+#     scores = scores.copy()
+#     users, items = train_matrix.nonzero()
+#     scores[users, items] = -np.inf
+#     return scores
 
 
 # ============================================================
@@ -82,7 +82,7 @@ def train_and_evaluate_als(
     item_factors = model.user_factors   # (n_items, factors)
 
     scores = user_factors @ item_factors.T
-    scores = mask_train_items(scores, train_matrix)
+    # scores = mask_train_items(scores, train_matrix)
 
     return compute_map_at_k_als(scores, test_matrix, k=k)
 
@@ -93,9 +93,9 @@ def train_and_evaluate_als(
 
 def als_grid_search(train_matrix, test_matrix):
     param_grid = {
-        "factors": [192],
-        "regularization": [0.1],
-        "alpha": [80],
+        "factors": [64, 128, 192],
+        "regularization": [0.01, 0.05, 0.1],
+        "alpha": [20, 40, 80],
         "iterations": [30, 40]
     }
 
