@@ -58,7 +58,7 @@ def clean_title(title: str) -> str:
     title = re.sub(r"\s*/\s*$", "", title)
     return title
 
-def clean_items(df: pd.DataFrame, interactions_df: List[int]) -> pd.DataFrame:
+def clean_items(df: pd.DataFrame, interactions_df: List[int], remove_subjects=False) -> pd.DataFrame:
     """
     Clean all item metadata fields.
     
@@ -93,7 +93,11 @@ def clean_items(df: pd.DataFrame, interactions_df: List[int]) -> pd.DataFrame:
         "author_clean", "publisher_clean", 
         "subjects_list", "has_subjects"
     ]].copy()
-    
+    if remove_subjects:
+        all_subjects = df_clean["subjects_list"].explode().unique()
+        for subject in all_subjects:
+            if df_clean["subjects_list"].apply(lambda x: subject in x).sum() == 1:
+                df_clean["subjects_list"] = df_clean["subjects_list"].apply(lambda x: [s for s in x if s != subject])
     # Validate
     assert df_clean["i"].is_unique, "Item IDs must be unique"
     assert df_clean["title_clean"].notna().all(), "All items must have titles"
@@ -113,6 +117,8 @@ if __name__ == "__main__":
     items = load_items()
     interactions = load_interactions()
     items_clean = clean_items(items, interactions)
+    subects = items_clean.iloc[0]["subjects_list"][0]
+    print(f"subjects: {subects}")
     item_stats = get_item_stats(items_clean)
     print(item_stats)
     print(f"columns: {items_clean.columns}")
