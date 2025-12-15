@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.14"
 
 [[package]]
@@ -236,6 +236,18 @@ wheels = [
 ]
 
 [[package]]
+name = "hdbscan"
+version = "0.8.41"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "joblib" },
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0c/22/32a66dd4ce72145ec1b792c794b98897be467bdf18c10aa8b48275530b11/hdbscan-0.8.41.tar.gz", hash = "sha256:e41e823e5bb21ff2173f252d226266b1dda82bdbba5d89106eafb251429dff3d", size = 7091384, upload-time = "2025-12-12T15:48:30.807Z" }
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -463,6 +475,7 @@ name = "lazy-librarian-rs"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "hdbscan" },
     { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "numpy" },
@@ -476,6 +489,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "hdbscan", specifier = ">=0.8.41" },
     { name = "ipykernel", specifier = ">=7.1.0" },
     { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "numpy", specifier = ">=2.3.5" },

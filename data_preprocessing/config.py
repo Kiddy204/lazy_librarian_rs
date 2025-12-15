@@ -1,4 +1,5 @@
 """Configuration constants for data preprocessing pipeline."""
+
 from pathlib import Path
 
 # Paths
@@ -20,6 +21,10 @@ UNKNOWN_PUBLISHER = "__UNKNOWN__"
 RARE_AUTHOR_THRESHOLD = 2  # Authors with fewer items -> "RARE"
 RARE_PUBLISHER_THRESHOLD = 3
 
+# Topic clustering settings
+TOPIC_MIN_CLUSTER_SIZE = 8  # HDBSCAN min_cluster_size
+TOPIC_MIN_SAMPLES = 2  # HDBSCAN min_samples
+
 # Output files
 OUTPUT_FILES = {
     "interactions_clean": OUTPUT_DIR / "interactions_clean.parquet",
@@ -27,6 +32,9 @@ OUTPUT_FILES = {
     "title_embeddings": OUTPUT_DIR / "title_embeddings.npy",
     "subject_matrix": OUTPUT_DIR / "subject_tfidf.npz",
     "subject_vocab": OUTPUT_DIR / "subject_vocab.json",
+    "topic_matrix": OUTPUT_DIR / "topic_multihot.npz",
+    "topic_artifacts": OUTPUT_DIR / "topic_artifacts.pkl",
+    "items_with_topics": OUTPUT_DIR / "items_with_topics.parquet",
     "author_encoder": OUTPUT_DIR / "author_encoder.pkl",
     "publisher_encoder": OUTPUT_DIR / "publisher_encoder.pkl",
     "feature_matrix": OUTPUT_DIR / "item_features.npz",

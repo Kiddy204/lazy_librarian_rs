@@ -1,94 +1,115 @@
 """Categorical feature encoding."""
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder
+
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pickle
 from typing import Tuple
-from config import (
-    RARE_AUTHOR_THRESHOLD, RARE_PUBLISHER_THRESHOLD,
-    UNKNOWN_AUTHOR, UNKNOWN_PUBLISHER
+
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+
+from data_preprocessing.clean_items import clean_items
+from data_preprocessing.config import (
+    RARE_AUTHOR_THRESHOLD,
+    RARE_PUBLISHER_THRESHOLD,
+    UNKNOWN_AUTHOR,
+    UNKNOWN_PUBLISHER,
 )
-from clean_items import clean_items
-from load_data import load_interactions, load_items
+from data_preprocessing.load_data import load_interactions, load_items
+
 
 class FrequencyAwareLabelEncoder:
     """
     Label encoder that groups rare categories.
     Categories below threshold are mapped to a single 'RARE' category.
     """
+
     def __init__(self, rare_threshold: int, rare_label: str = "__RARE__"):
         self.rare_threshold = rare_threshold
         self.rare_label = rare_label
         self.encoder = LabelEncoder()
         self.frequent_categories = set()
-    
+
     def fit(self, values: pd.Series) -> "FrequencyAwareLabelEncoder":
         # Count frequencies
         freq = values.value_counts()
         self.frequent_categories = set(freq[freq >= self.rare_threshold].index)
-        
+
         # Map rare to rare_label
         mapped = values.apply(
             lambda x: x if x in self.frequent_categories else self.rare_label
         )
         self.encoder.fit(mapped)
         return self
-    
+
     def transform(self, values: pd.Series) -> np.ndarray:
         mapped = values.apply(
             lambda x: x if x in self.frequent_categories else self.rare_label
         )
         return self.encoder.transform(mapped)
-    
+
     def fit_transform(self, values: pd.Series) -> np.ndarray:
         self.fit(values)
         return self.transform(values)
-    
+
     @property
     def n_classes(self) -> int:
         return len(self.encoder.classes_)
-    
+
     @property
     def classes_(self) -> np.ndarray:
         return self.encoder.classes_
 
+
 def encode_authors(df: pd.DataFrame) -> Tuple[np.ndarray, FrequencyAwareLabelEncoder]:
     """
     Encode author column with rare author grouping.
-    
+
     Returns:
         - encoded array of shape (n_items,)
         - fitted encoder for saving
     """
     encoder = FrequencyAwareLabelEncoder(
-        rare_threshold=RARE_AUTHOR_THRESHOLD,
-        rare_label="__RARE_AUTHOR__"
+        rare_threshold=RARE_AUTHOR_THRESHOLD, rare_label="__RARE_AUTHOR__"
     )
     encoded = encoder.fit_transform(df["author_clean"])
-    print(f"Authors: {df['author_clean'].nunique()} unique -> {encoder.n_classes} categories")
+    print(
+        f"Authors: {df['author_clean'].nunique()} unique -> {encoder.n_classes} categories"
+    )
     return encoded, encoder
 
-def encode_publishers(df: pd.DataFrame) -> Tuple[np.ndarray, FrequencyAwareLabelEncoder]:
+
+def encode_publishers(
+    df: pd.DataFrame,
+) -> Tuple[np.ndarray, FrequencyAwareLabelEncoder]:
     """
     Encode publisher column with rare publisher grouping.
     """
     encoder = FrequencyAwareLabelEncoder(
-        rare_threshold=RARE_PUBLISHER_THRESHOLD,
-        rare_label="__RARE_PUBLISHER__"
+        rare_threshold=RARE_PUBLISHER_THRESHOLD, rare_label="__RARE_PUBLISHER__"
     )
     encoded = encoder.fit_transform(df["publisher_clean"])
-    print(f"Publishers: {df['publisher_clean'].nunique()} unique -> {encoder.n_classes} categories")
+    print(
+        f"Publishers: {df['publisher_clean'].nunique()} unique -> {encoder.n_classes} categories"
+    )
     return encoded, encoder
+
 
 def save_encoder(encoder: FrequencyAwareLabelEncoder, path: str) -> None:
     """Save encoder for inference."""
     with open(path, "wb") as f:
         pickle.dump(encoder, f)
 
+
 def load_encoder(path: str) -> FrequencyAwareLabelEncoder:
     """Load saved encoder."""
     with open(path, "rb") as f:
         return pickle.load(f)
+
 
 if __name__ == "__main__":
     items = load_items()
